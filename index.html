@@ -526,6 +526,17 @@ addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {p
     Cal("init", { origin:"https://cal.com" });
     Cal("inline", { elementOrSelector:"#calEmbed", calLink:CAL_LINK, layout:"month_view", config:{ theme:"dark" } });
     Cal("ui", { theme:"dark", cssVarsPerTheme:{ dark:{ "cal-brand":"#f2f7f8" } }, layout:"month_view" });
+    // Après la réservation : on ferme l'agenda et on affiche juste une confirmation
+    let done = false;
+    const merci = () => {
+      if (done) return; done = true;
+      box.innerHTML = '<div style="text-align:center;padding:48px 20px;border:1px solid rgba(255,255,255,.15);border-radius:16px">'
+        + '<p style="font-size:1.6rem;margin:0 0 8px">✅ Rendez-vous confirmé</p>'
+        + '<p style="opacity:.75;margin:0">Merci, à bientôt chez GORAN CUTZ.</p></div>';
+      box.scrollIntoView({ behavior:'smooth', block:'center' });
+    };
+    Cal("on", { action:"bookingSuccessfulV2", callback:merci });
+    Cal("on", { action:"bookingSuccessful", callback:merci });
     return;
   }
   const state = { service:null, date:null, time:null };
