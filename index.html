@@ -524,15 +524,33 @@ addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {p
     $('#planner').hidden = true; const box = $('#calEmbed'); box.hidden = false;
     (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
     Cal("init", { origin:"https://cal.com" });
-    Cal("inline", { elementOrSelector:"#calEmbed", calLink:CAL_LINK, layout:"month_view", config:{ theme:"dark" } });
-    Cal("ui", { theme:"dark", cssVarsPerTheme:{ dark:{ "cal-brand":"#f2f7f8" } }, layout:"month_view" });
-    // Après la réservation : on ferme l'agenda et on affiche juste une confirmation
+    Cal("ui", { theme:"dark", hideEventTypeDetails:true, cssVarsPerTheme:{ dark:{ "cal-brand":"#f2f7f8" } }, layout:"month_view" });
+    // Choix de la prestation sur le site, puis agenda du bon type de rendez-vous (durée automatique)
+    const TYPES = [
+      ['coupe', 'rdv', 'Coupe', '30 min · 30.- / enfant 25.-'],
+      ['coupe-barbe', 'coupe-barbe', 'Coupe + barbe', '45 min · 40.-'],
+      ['barbe', 'barbe-epilation', 'Barbe & épilation', '15 min · 10.- à 20.-']
+    ];
+    const choix = document.createElement('div');
+    choix.className = 'chips'; choix.id = 'calChoix'; choix.style.marginBottom = '18px';
+    choix.innerHTML = TYPES.map(t => `<button type="button" class="chip" data-slug="${t[1]}" aria-pressed="false">${t[2]}<small>${t[3]}</small></button>`).join('');
+    box.before(choix);
     let done = false;
+    const ouvrir = slug => {
+      choix.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.slug === slug));
+      box.innerHTML = '';
+      Cal("inline", { elementOrSelector:"#calEmbed", calLink:CAL_LINK + '/' + slug, layout:"month_view", config:{ theme:"dark" } });
+    };
+    choix.addEventListener('click', e => { const b = e.target.closest('.chip'); if (b && !done) ouvrir(b.dataset.slug); });
+    ouvrir(TYPES[0][1]);
+    // Après la réservation : on ferme l'agenda et on affiche juste une confirmation
     const merci = () => {
       if (done) return; done = true;
-      box.innerHTML = '<div style="text-align:center;padding:48px 20px;border:1px solid rgba(255,255,255,.15);border-radius:16px">'
+      choix.remove();
+      box.innerHTML = '<div style="text-align:center;padding:48px 20px">'
         + '<p style="font-size:1.6rem;margin:0 0 8px">✅ Rendez-vous confirmé</p>'
         + '<p style="opacity:.75;margin:0">Merci, à bientôt chez GORAN CUTZ.</p></div>';
+      box.style.minHeight = '0';
       box.scrollIntoView({ behavior:'smooth', block:'center' });
     };
     Cal("on", { action:"bookingSuccessfulV2", callback:merci });
