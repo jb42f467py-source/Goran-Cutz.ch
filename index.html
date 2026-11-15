@@ -159,6 +159,11 @@ h2{font-size:clamp(3.2rem,9vw,7.5rem)}
 .ticket .done{display:none;margin-top:12px;font-weight:600;color:var(--led)}
 .tagline{padding:56px 0;text-align:center;background:var(--night);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
 .tagline p{color:var(--led);font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(1.6rem,4vw,3rem);line-height:1.1;letter-spacing:.01em;max-width:24ch;margin:0 auto}
+#calChoix{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+#calChoix .chip{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border-radius:14px;text-align:left;width:100%}
+#calChoix .num{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:14px}
+#calChoix .txt b{display:block;font-size:1.05rem}
+#calChoix .txt small{margin:2px 0 0;display:block}
 #calEmbed{min-height:660px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
 
 /* SALON */
@@ -527,13 +532,13 @@ addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {p
     Cal("ui", { theme:"dark", hideEventTypeDetails:true, cssVarsPerTheme:{ dark:{ "cal-brand":"#f2f7f8" } }, layout:"month_view" });
     // Choix de la prestation sur le site, puis agenda du bon type de rendez-vous (durée automatique)
     const TYPES = [
-      ['coupe', 'rdv', 'Coupe', '30 min · 30.- / enfant 25.-'],
-      ['coupe-barbe', 'coupe-barbe', 'Coupe + barbe', '45 min · 40.-'],
-      ['barbe', 'barbe-epilation', 'Barbe & épilation', '15 min · 10.- à 20.-']
+      ['coupe', 'rdv', 'Coupe', '30 min'],
+      ['coupe-barbe', 'coupe-barbe', 'Coupe + barbe', '45 min'],
+      ['barbe', 'barbe-epilation', 'Barbe & épilation', '15 min']
     ];
     const choix = document.createElement('div');
-    choix.className = 'chips'; choix.id = 'calChoix'; choix.style.marginBottom = '18px';
-    choix.innerHTML = TYPES.map(t => `<button type="button" class="chip" data-slug="${t[1]}" aria-pressed="false">${t[2]}<small>${t[3]}</small></button>`).join('');
+    choix.id = 'calChoix';
+    choix.innerHTML = TYPES.map((t, i) => `<button type="button" class="chip" data-slug="${t[1]}" aria-pressed="false"><span class="num">${i+1}</span><span class="txt"><b>${t[2]}</b><small>${t[3]}</small></span></button>`).join('');
     box.before(choix);
     let done = false;
     const ouvrir = slug => {
