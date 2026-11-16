@@ -78,10 +78,12 @@ h2{font-size:clamp(3.2rem,9vw,7.5rem)}
 .book-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:46px}
 .stage{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:stretch}
 .stage-frame{position:relative;aspect-ratio:4/5;max-height:78vh;overflow:hidden;border-radius:6px;background:var(--panel);cursor:zoom-in;border:0;padding:0}
+.stage-frame{display:block;width:100%}
+.stage-frame::before{content:"";display:block;padding-top:125%}
 .stage-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .8s ease}
 .stage-frame img.out{opacity:0}
 .stage-side{display:flex;flex-direction:column;justify-content:flex-start;gap:30px;padding-block:6px}
-.stage-count{margin-bottom:auto;padding-bottom:40px;font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--chrome);letter-spacing:.06em}
+.stage-count{display:none;margin-bottom:auto;padding-bottom:40px;font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--chrome);letter-spacing:.06em}
 .stage-name{font-size:clamp(3rem,6.4vw,6rem);transition:opacity .5s}
 .stage-name.out{opacity:0}
 .stage-desc{color:var(--chrome);max-width:34ch;margin-top:16px;transition:opacity .5s}
@@ -426,7 +428,7 @@ const PRESTATIONS = [
   ['Coupe homme',30],['Coupe + barbe',40],['Barbe',20],
   ['Enfant −15 ans',25],['Épilation au fil',10],['Épilation à la cire',15]
 ];
-const GALERIE_INTERVALLE = 10000; // 10 secondes
+const GALERIE_INTERVALLE = 15000; // 15 secondes
 // Agenda automatique Cal.com : coller le lien (ex. 'gorancutz/coupe'). Vide = demande WhatsApp.
 const CAL_LINK = 'gorancutz';
 /* =========================================================================== */
@@ -504,7 +506,6 @@ addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {p
     restartBar();
   }
   function restartBar(){
-    if (reduce) return;
     clearTimeout(timer); timer = setTimeout(tick, GALERIE_INTERVALLE);
   }
   function tick(){
@@ -513,8 +514,8 @@ addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), {p
   }
   btns.forEach((b,k) => b.addEventListener('click', () => show(k)));
   const frame = $('#stageFrame');
-  frame.addEventListener('mouseenter', () => paused = true);
-  frame.addEventListener('mouseleave', () => paused = false);
+  frame.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') paused = true; });
+  frame.addEventListener('pointerleave', () => paused = false);
   frame.addEventListener('click', () => { $('#lbImg').src = img.src; $('#lbImg').alt = img.alt; $('#lightbox').classList.add('open'); });
   const lb = $('#lightbox'), close = () => { lb.classList.remove('open'); $('#lbImg').src = ''; };
   $('#lbClose').addEventListener('click', close);
